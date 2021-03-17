@@ -24,12 +24,12 @@ factor_overrides = []
 schedule = {}
 end_day = -1
 
-@app.route('/post/', methods=['POST'])
+@app.route('/createsched/', methods=['POST'])
 def create_schedule_config(id: int):
     """ create a new schedule config and write it as json txt file """
     target_daily_send_vol = request.form.get('target_daily_send_vol', 650000)  
     print(type(target_daily_send_vol))
-
+    return target_daily_send_vol
 
 
 
