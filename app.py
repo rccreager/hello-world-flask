@@ -195,13 +195,13 @@ def build_schedule():
 
 
 
-def set_current_day(day: int):
-    """Sets the current day to `day`. The schedule will be fixed (and not recomputed) for previous days"""
-    current_day = day
-
-def get_current_day():
-    """Return the current day"""
-    return current_day
+#def set_current_day(day: int):
+#    """Sets the current day to `day`. The schedule will be fixed (and not recomputed) for previous days"""
+#    current_day = day
+#
+#def get_current_day():
+#    """Return the current day"""
+#    return current_day
 
 #@app.route('/buildsched/', methods=['GET'])
 #def build_schedule():
@@ -239,24 +239,24 @@ def get_current_day():
 #        json.dump(schedule, outfile)
 #    return jsonify(schedule)
 
-@app.route('/getsched/', methods=['GET'])
-def read_schedule(id = 555):
-    try:
-        with open(f'schedule{id}.txt') as json_file:
-            data = json.load(json_file)
-        print(data)
-        return data
-    except:
-        print("file not found!")
-        return "file not found"
-
-def add_override(day, emails):
-    """Set a specific number of emails to send on a particular `day`"""
-    overrides[day] = emails
-
-def add_factor_override(start_day, end_day, factor):
-    """Use `factor` instead of the `global_warmup_factor` between `start_day` and `end_day` (inclusive)"""
-    factor_overrides.append((start_day, end_day, factor))
+#@app.route('/getsched/', methods=['GET'])
+#def read_schedule(id = 555):
+#    try:
+#        with open(f'schedule{id}.txt') as json_file:
+#            data = json.load(json_file)
+#        print(data)
+#        return data
+#    except:
+#        print("file not found!")
+#        return "file not found"
+#
+#def add_override(day, emails):
+#    """Set a specific number of emails to send on a particular `day`"""
+#    overrides[day] = emails
+#
+#def add_factor_override(start_day, end_day, factor):
+#    """Use `factor` instead of the `global_warmup_factor` between `start_day` and `end_day` (inclusive)"""
+#    factor_overrides.append((start_day, end_day, factor))
 
 
 
