@@ -203,41 +203,41 @@ def get_current_day():
     """Return the current day"""
     return current_day
 
-@app.route('/buildsched/', methods=['GET'])
-def build_schedule():
-    """Compute the schedule, taking into account overrides"""
-    print("schedule ID: 555")
-    for day in range(1, max_sched_length + 1):
-        if day < current_day:
-            assert day in schedule
-        else:
-            if day == 1:
-                emails = initial_per_ip_vol * initial_per_ip_vol
-            else:
-                warmup_factor = global_warmup_factor
-                for start_day, end_day, factor in factor_overrides:
-                    if start_day <= day <= end_day:
-                        warmup_factor = factor
-                        break
-                if day in overrides:
-                    emails = overrides[day]
-                else:
-                    emails = schedule[day - 1] * warmup_factor
-            #round values down to avoid fractional sends
-            emails = floor(emails)
-            if emails >= target_daily_send_vol:
-                emails = target_daily_send_vol
-                schedule[day] = emails
-                end_day = day
-                break
-            else:
-                schedule[day] = emails
-    if end_day == -1:
-        end_day = day
-    assert schedule[end_day] == target_daily_send_vol
-    with open('schedule555.txt', 'w') as outfile:
-        json.dump(schedule, outfile)
-    return jsonify(schedule)
+#@app.route('/buildsched/', methods=['GET'])
+#def build_schedule():
+#    """Compute the schedule, taking into account overrides"""
+#    print("schedule ID: 555")
+#    for day in range(1, max_sched_length + 1):
+#        if day < current_day:
+#            assert day in schedule
+#        else:
+#            if day == 1:
+#                emails = initial_per_ip_vol * initial_per_ip_vol
+#            else:
+#                warmup_factor = global_warmup_factor
+#                for start_day, end_day, factor in factor_overrides:
+#                    if start_day <= day <= end_day:
+#                        warmup_factor = factor
+#                        break
+#                if day in overrides:
+#                    emails = overrides[day]
+#                else:
+#                    emails = schedule[day - 1] * warmup_factor
+#            #round values down to avoid fractional sends
+#            emails = floor(emails)
+#            if emails >= target_daily_send_vol:
+#                emails = target_daily_send_vol
+#                schedule[day] = emails
+#                end_day = day
+#                break
+#            else:
+#                schedule[day] = emails
+#    if end_day == -1:
+#        end_day = day
+#    assert schedule[end_day] == target_daily_send_vol
+#    with open('schedule555.txt', 'w') as outfile:
+#        json.dump(schedule, outfile)
+#    return jsonify(schedule)
 
 @app.route('/getsched/', methods=['GET'])
 def read_schedule(id = 555):
