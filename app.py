@@ -145,7 +145,7 @@ def build_schedule():
         return f"Config file {filename} doesn't exist, you must create it", 404
     target_daily_send_vol = config['target_daily_send_vol']
     number_of_ips = config['number_of_ips']
-    global_warmup_factor = config['warmup_factor']
+    global_warmup_factor = config['global_warmup_factor']
     max_sched_length = config["max_sched_length"]
     factor_overrides = config["factor_overrides"] 
     current_day = 1 
