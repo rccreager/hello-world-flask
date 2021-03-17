@@ -26,7 +26,7 @@ def create_schedule_config():
     id = request.form.get('id')
     assert id, "You must set the id value"
     filename = f'config{id}.txt'
-    if os.path.exists(file_name) and os.path.isfile(file_name):
+    if os.path.exists(filename) and os.path.isfile(filename):
         return f"Schedule {filename} already exists", 409
     target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")
     number_of_ips = request.form.get('number_of_ips', "2")
@@ -39,7 +39,7 @@ def create_schedule_config():
         "max_sched_length" : int(max_sched_length),
         "factor_overrides" : []
     }
-    with open(file_name, 'w') as outfile:
+    with open(filename, 'w') as outfile:
         json.dump(config, outfile)
     return config
 
