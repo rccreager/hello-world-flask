@@ -46,12 +46,11 @@ def build_schedule(config):
 
 @app.route('/create_schedule/', methods=['POST'])
 def create_schedule():
-    print(request.form)
-    print(request.json)
-    target_daily_send_vol = request.form.get('targetDailySendVolume')
-    first_day_vol = request.form.get('firstDayVolume')
-    ramp_rate = request.form.get('startingRampRate')
-    max_schedule_length = request.form.get('maxScheduleLength')
+    json_data = request.json
+    target_daily_send_vol = json_data['targetDailySendVolume']
+    first_day_vol = json_data['firstDayVolume']
+    ramp_rate = json_data['startingRampRate']
+    max_schedule_length = json_data['maxScheduleLength']
     assert target_daily_send_vol and first_day_vol and ramp_rate and max_schedule_length
     config = {
         "target_daily_send_vol" : int(target_daily_send_vol),
