@@ -166,10 +166,10 @@ def build_schedule():
     factor_overrides = config["factor_overrides"]
     current_day = 1
     for day in range(1, max_sched_length + 1):
+        warmup_factor = global_warmup_factor
         if day == 1:
             emails = number_of_ips * initial_per_ip_vol
         else:
-            warmup_factor = global_warmup_factor
             for start_day, end_day, factor in factor_overrides:
                 if start_day <= day <= end_day:
                     warmup_factor = factor
