@@ -27,7 +27,7 @@ def create_schedule_config():
     assert id, "You must set the id value"
     filename = f'config{id}.txt'
     if os.path.exists(filename) and os.path.isfile(filename):
-        return f"Schedule {filename} already exists", 409
+        return f"Schedule {filename} already exists\n", 409
     target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")
     number_of_ips = request.form.get('number_of_ips', "2")
     global_warmup_factor = request.form.get('warmup_factor', "1.5")
@@ -51,49 +51,43 @@ def get_config():
         with open(filename) as f:
             config = json.load(f)
     except:
-        return f"Config file {filename} doesn't exist, you must create it", 404
+        return f"Config file {filename} doesn't exist, you must create it\n", 404
     return config
 
-@app.route('/add_factor_override/', methods=['PUT'])
-def add_factor_override():
-    config = get_config()
-    print(f"old config: {config}")
-    factor_overrides = config["factor_overrides"]
+def get_factor_override_value():
     start_day = request.form.get('start_day')
     end_day = request.form.get('end_day')
     factor = request.form.get('warmup_factor')
     assert start_day, "You must choose a start day (int)"
     assert end_day, "You must choose an end day (int)"
     assert factor, "You must choose the new warmup factor"
-    override = [start_day, end_day, factor]
+    return [start_day, end_day, factor]
+
+@app.route('/add_factor_override/', methods=['PUT'])
+def add_factor_override():
+    config = get_config()
+    factor_overrides = config["factor_overrides"]
+    start_day, end_day, factor = get_start_end_factor_values()
+    override = get_factor_override_value()
     if override not in factor_overrides:
         factor_overrides.append(override)
     else:
-        return f"Override {override} already exists", 409
+        return f"Override {override} already exists\n", 409
     config["factor_overrides"] = factor_overrides
-    print(f"new config: {config}")
     with open(filename, 'w') as outfile:
         json.dump(config, outfile)
     return config
 
 @app.route('/remove_factor_override/', methods=['PUT'])
 def remove_factor_override():
-    config = get_config() 
-    print(f"old config: {config}")
+    config = get_config()
     factor_overrides = config["factor_overrides"]
-    start_day = request.form.get('start_day')
-    end_day = request.form.get('end_day')
-    factor = request.form.get('warmup_factor')
-    assert start_day, "You must choose a start day (int)"
-    assert end_day, "You must choose an end day (int)"
-    assert factor, "You must choose the new warmup factor"
-    override = [start_day, end_day, factor]
+    override = get_factor_override_value()
     if override in factor_overrides:
         factor_overrides.remove(override)
     else:
-        return f"Override {override} does not exist, so it cannot be removed", 404
+        return f"Override {override} does not exist, so it cannot be removed\n", 404
     config["factor_overrides"] = factor_overrides
-    print(f"new config: {config}")
     with open(filename, 'w') as outfile:
         json.dump(config, outfile)
     return config
@@ -101,9 +95,8 @@ def remove_factor_override():
 # PUT
 @app.route('/clear_factor_overrides/', methods=['PUT'])
 def clear_factor_overrides():
-    config = get_config() 
+    config = get_config()
     config["factor_overrides"] = []
-    print(f"new config: {config}")
     with open(filename, 'w') as outfile:
         json.dump(config, outfile)
     return config
@@ -111,12 +104,12 @@ def clear_factor_overrides():
 ## GET
 @app.route('/get_schedule_config/', methods=['GET'])
 def get_schedule_config():
-    return get_config() 
+    return get_config()
 
 # GET
 @app.route('/build_schedule/', methods=['GET'])
 def build_schedule():
-    config = get_config() 
+    config = get_config()
     target_daily_send_vol = config['target_daily_send_vol']
     number_of_ips = config['number_of_ips']
     global_warmup_factor = config['global_warmup_factor']
@@ -164,7 +157,7 @@ def get_schedule():
         with open(filename) as f:
             schedule = json.load(f)
     except:
-        return f"Schedule file {filename} doesn't exist, you must build it", 404
+        return f"Schedule file {filename} doesn't exist, you must build it\n", 404
     return schedule
 
 
