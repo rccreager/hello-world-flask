@@ -49,7 +49,7 @@ def add_factor_override():
     id = request.form.get('id')
     assert id, "You must choose an id value"
     #TODO throw error if config doesn't exist
-    with open('config{id}.txt') as f:
+    with open(f'config{id}.txt') as f:
         config = json.load(f)
     print(f"old config: {config}")
     factor_overrides = config["factor_overrides"]
