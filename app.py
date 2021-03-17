@@ -1,13 +1,10 @@
 # app.py
 from flask import Flask, request, jsonify
-
 from copy import deepcopy
-
 from math import floor
-
 import json
-
 from collections import namedtuple
+import os
 
 app = Flask(__name__)
 
@@ -28,8 +25,10 @@ def create_schedule_config():
     """ create a new schedule config and write it as json txt file """
     id = request.form.get('id')
     assert id, "You must set the id value"
-    # TODO throw error if sched config already exists
-    target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")  
+    file_name = f'config{id}.txt'
+    if os.path.exists(file_name) and os.path(isfile(file_name)):
+        return Exception(f"Schedule {filename} already exists"), 409
+    target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")
     number_of_ips = request.form.get('number_of_ips', "2")
     global_warmup_factor = request.form.get('warmup_factor', "1.5")
     max_sched_length = request.form.get("max_sched_length", "50")
@@ -40,17 +39,20 @@ def create_schedule_config():
         "max_sched_length" : int(max_sched_length),
         "factor_overrides" : []
     }
-    with open(f'config{id}.txt', 'w') as outfile:
+    with open(file_name, 'w') as outfile:
         json.dump(config, outfile)
-    return config 
+    return config
 
-@app.route('/add_factor_override/', methods=['PUT'])  
+@app.route('/add_factor_override/', methods=['PUT'])
 def add_factor_override():
     id = request.form.get('id')
     assert id, "You must choose an id value"
-    #TODO throw error if config doesn't exist
-    with open(f'config{id}.txt') as f:
-        config = json.load(f)
+    filename = f'config{id}.txt'
+    try:
+        with open(filename) as f:
+            config = json.load(f)
+    except:
+        return Exception(f"Config file {filename} doesn't exist, you must create it"), 404
     print(f"old config: {config}")
     factor_overrides = config["factor_overrides"]
     start_day = request.form.get('start_day')
@@ -59,33 +61,61 @@ def add_factor_override():
     assert start_day, "You must choose a start day (int)"
     assert end_day, "You must choose an end day (int)"
     assert factor, "You must choose the new warmup factor"
+    override = (start_day, end_day, factor)
     if (start_day, end_day, factor) not in factor_overrides:
-        factor_overrides.append((start_day, end_day, factor))
-    #TODO throw error if value already in overrides 
+        factor_overrides.append(override)
+    else:
+        return Exception(f"Override {override} already exists"), 409
     config["factor_overrides"] = factor_overrides
-    print(f"new config: {config}") 
-    with open(f'config{id}.txt', 'w') as outfile:
+    print(f"new config: {config}")
+    with open(filename, 'w') as outfile:
         json.dump(config, outfile)
+    return config
+
+@app.route('/remove_factor_override/', methods=['PUT'])
+def remove_factor_override():
+    id = request.form.get('id')
+    assert id, "You must choose an id value"
+    filename = f'config{id}.txt'
+    try:
+        with open(filename) as f:
+            config = json.load(f)
+    except:
+        return Exception(f"Config file {filename} doesn't exist, you must create it"), 404
+    print(f"old config: {config}")
+    factor_overrides = config["factor_overrides"]
+    start_day = request.form.get('start_day')
+    end_day = request.form.get('end_day')
+    factor = request.form.get('warmup_factor')
+    assert start_day, "You must choose a start day (int)"
+    assert end_day, "You must choose an end day (int)"
+    assert factor, "You must choose the new warmup factor"
+    override = (start_day, end_day, factor)
+    if override in factor_overrides:
+        factor_overrides.remove(override)
+    else:
+        return Exception(f"Override {override} does not exist, so it cannot be removed"), 404
+    config["factor_overrides"] = factor_overrides
+    print(f"new config: {config}")
+    with open(filename, 'w') as outfile:
+        json.dump(config, outfile)
+    return config
 
 ## PUT
-#def remove_factor_override():
-#    
-#
-## PUT
 #def clear_factor_overrides():
-#    
+#
 #
 ## GET
 #def get_schedule_config():
-#    
+#
 #
 ## GET
 #def build_schedule():
-#    
+#
 #
 ## GET
 #def get_schedule():
-#    
+#
 
 
 
@@ -139,7 +169,7 @@ def build_schedule():
         json.dump(schedule, outfile)
     return jsonify(schedule)
 
-@app.route('/getsched/', methods=['GET']) 
+@app.route('/getsched/', methods=['GET'])
 def read_schedule(id = 555):
     try:
         with open(f'schedule{id}.txt') as json_file:
