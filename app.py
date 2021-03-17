@@ -15,11 +15,11 @@ def build_schedule(config):
     target_daily_send_vol = config['target_daily_send_vol']
     first_day_vol = config["first_day_vol"]
     ramp_rate = config["ramp_rate"]
-    max_sched_length = config["max_sched_length"]
+    max_schedule_length = config["max_schedule_length"]
     factor_overrides = config["factor_overrides"]
     volume_overrides = config["volume_overrides"]
     current_day = 0
-    for day in range(0, max_sched_length + 1):
+    for day in range(0, max_schedule_length + 1):
         daily_ramp_rate = ramp_rate
         if day == 0:
             emails = first_day_vol
@@ -63,7 +63,7 @@ def create_schedule():
         "target_daily_send_vol" : int(target_daily_send_vol),
         "first_day_vol" : int(first_day_vol),
         "ramp_rate" : float(ramp_rate),
-        "max_sched_length" : int(max_sched_length),
+        "max_schedule_length" : int(max_schedule_length),
         "factor_overrides" : {},
         "volume_overrides": {}
     }
