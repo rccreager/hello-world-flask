@@ -132,10 +132,57 @@ def get_schedule_config():
         return f"Config file {filename} doesn't exist, you must create it", 404
     return config
 
-## GET
-#def build_schedule():
-#
-#
+# GET
+@app.route('/build_schedule/', methods=['GET']) 
+def build_schedule():
+    id = request.form.get('id')
+    assert id, "You must choose an id value"
+    filename = f'config{id}.txt'
+    try:
+        with open(filename) as f:
+            config = json.load(f)
+    except:
+        return f"Config file {filename} doesn't exist, you must create it", 404
+    target_daily_send_vol = config['target_daily_send_vol']
+    number_of_ips = config['number_of_ips']
+    global_warmup_factor = config['warmup_factor']
+    max_sched_length = config["max_sched_length"]
+    factor_overrides = config["factor_overrides"] 
+    current_day = 1 
+    for day in range(1, max_sched_length + 1):
+        if day < current_day:
+            assert day in schedule
+        else:
+            if day == 1:
+                emails = number_of_ips * initial_per_ip_vol
+            else:
+                warmup_factor = global_warmup_factor
+                for start_day, end_day, factor in factor_overrides:
+                    if start_day <= day <= end_day:
+                        warmup_factor = factor
+                        break
+                if day in overrides:
+                    emails = overrides[day]
+                else:
+                    emails = schedule[day - 1] * warmup_factor
+            #round values down to avoid fractional sends
+            emails = floor(emails)
+            if emails >= target_daily_send_vol:
+                emails = target_daily_send_vol
+                schedule[day] = emails
+                end_day = day
+                break
+            else:
+                schedule[day] = emails
+    if end_day == -1:
+        end_day = day
+    assert schedule[end_day] == target_daily_send_vol
+    with open(f'schedule{id}.txt', 'w') as outfile:
+        json.dump(schedule, outfile)
+    return jsonify(schedule)
+
+
+
 ## GET
 #def get_schedule():
 #
