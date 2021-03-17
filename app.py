@@ -26,8 +26,8 @@ def create_schedule_config():
     id = request.form.get('id')
     assert id, "You must set the id value"
     file_name = f'config{id}.txt'
-    if os.path.exists(file_name) and os.path(isfile(file_name)):
-        return Exception(f"Schedule {filename} already exists"), 409
+    if os.path.exists(file_name) and os.path.isfile(file_name):
+        return f"Schedule {filename} already exists", 409
     target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")
     number_of_ips = request.form.get('number_of_ips', "2")
     global_warmup_factor = request.form.get('warmup_factor', "1.5")
@@ -52,7 +52,7 @@ def add_factor_override():
         with open(filename) as f:
             config = json.load(f)
     except:
-        return Exception(f"Config file {filename} doesn't exist, you must create it"), 404
+        return f"Config file {filename} doesn't exist, you must create it", 404
     print(f"old config: {config}")
     factor_overrides = config["factor_overrides"]
     start_day = request.form.get('start_day')
@@ -65,7 +65,7 @@ def add_factor_override():
     if override not in factor_overrides:
         factor_overrides.append(override)
     else:
-        return Exception(f"Override {override} already exists"), 409
+        return f"Override {override} already exists", 409
     config["factor_overrides"] = factor_overrides
     print(f"new config: {config}")
     with open(filename, 'w') as outfile:
@@ -81,7 +81,7 @@ def remove_factor_override():
         with open(filename) as f:
             config = json.load(f)
     except:
-        return Exception(f"Config file {filename} doesn't exist, you must create it"), 404
+        return f"Config file {filename} doesn't exist, you must create it", 404
     print(f"old config: {config}")
     factor_overrides = config["factor_overrides"]
     start_day = request.form.get('start_day')
@@ -94,7 +94,7 @@ def remove_factor_override():
     if override in factor_overrides:
         factor_overrides.remove(override)
     else:
-        return Exception(f"Override {override} does not exist, so it cannot be removed"), 404
+        return f"Override {override} does not exist, so it cannot be removed", 404
     config["factor_overrides"] = factor_overrides
     print(f"new config: {config}")
     with open(filename, 'w') as outfile:
