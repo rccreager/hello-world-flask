@@ -171,8 +171,8 @@ def build_schedule():
             emails = number_of_ips * initial_per_ip_vol
         else:
             for start_day, end_day, factor in factor_overrides:
-                if start_day <= day <= end_day:
-                    warmup_factor = factor
+                if int(start_day) <= day <= int(end_day):
+                    warmup_factor = float(factor)
                     break
             if day in overrides:
                 emails = overrides[day]
