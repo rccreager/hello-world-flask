@@ -7,8 +7,9 @@ from math import floor
 
 import json
 
-app = Flask(__name__)
+from collections import namedtuple
 
+app = Flask(__name__)
 
 
 target_daily_send_vol=650000
@@ -22,6 +23,30 @@ overrides = {}
 factor_overrides = []
 schedule = {}
 end_day = -1
+
+@app.route('/post/', methods=['POST'])
+def create_schedule_config(id: int):
+    """ create a new schedule config and write it as json txt file """
+    target_daily_send_vol = request.form.get('target_daily_send_vol', 650000)  
+    print(type(target_daily_send_vol))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -137,6 +162,17 @@ def add_factor_override(start_day, end_day, factor):
 #        return jsonify({
 #            "ERROR": "no name found, please send a name."
 #        })
+
+
+
+
+
+
+
+
+
+
+
 
 # A welcome message to test our server
 @app.route('/')
