@@ -37,7 +37,8 @@ def create_schedule_config():
         "number_of_ips" : int(number_of_ips),
         "global_warmup_factor" : float(global_warmup_factor),
         "max_sched_length" : int(max_sched_length),
-        "factor_overrides" : []
+        "factor_overrides" : [],
+        "volume_overrides": {}
     }
     with open(filename, 'w') as outfile:
         json.dump(config, outfile)
@@ -67,7 +68,6 @@ def get_factor_override_value():
 def add_factor_override():
     config = get_config()
     factor_overrides = config["factor_overrides"]
-    start_day, end_day, factor = get_start_end_factor_values()
     override = get_factor_override_value()
     if override not in factor_overrides:
         factor_overrides.append(override)
@@ -101,6 +101,54 @@ def clear_factor_overrides():
         json.dump(config, outfile)
     return config
 
+
+def get_volume_override_value():
+    day = request.form.get('day')
+    volumne = request.form.get('volume')
+    assert day, "You must choose a day whose send volume you want to override (int)"
+    assert volume, f"You must choose a send value to override for day {day}"
+    return day, volume
+
+@app.route('/add_volume_override/', methods=['PUT'])
+def add_volume_override():
+    config = get_config()
+    volume_overrides = config["volume_overrides"]
+    day, volume = get_volume_override_value()
+    volume_overrides[day] = volume
+    config["volume_overrides"] = volume_overrides
+    with open(filename, 'w') as outfile:
+        json.dump(config, outfile)
+    return config
+
+@app.route('/remove_volume_override/', methods=['PUT'])
+def remove_volume_override():
+    config = get_config()
+    volume_overrides = config["volume_overrides"]
+    day = request.form.get('day') 
+    assert day, "You must choose a day to remove from your volume overrides (int)"
+    if day in volume_overrides: 
+        del volume_overrides[day] 
+    else:
+        return f"Day {day} does not appear in your volume overrides, so it cannot be removed\n", 404
+    config["volume_overrides"] = volume_overrides
+    with open(filename, 'w') as outfile:
+        json.dump(config, outfile)
+    return config
+
+# PUT
+@app.route('/clear_volume_overrides/', methods=['PUT'])
+def clear_volume_overrides():
+    config = get_config()
+    config["volume_overrides"] = {}
+    with open(filename, 'w') as outfile:
+        json.dump(config, outfile)
+    return config
+
+
+
+
+
+
 ## GET
 @app.route('/get_schedule_config/', methods=['GET'])
 def get_schedule_config():
@@ -117,38 +165,35 @@ def build_schedule():
     factor_overrides = config["factor_overrides"]
     current_day = 1
     for day in range(1, max_sched_length + 1):
-        if day < current_day:
-            assert day in schedule
+        if day == 1:
+            emails = number_of_ips * initial_per_ip_vol
         else:
-            if day == 1:
-                emails = number_of_ips * initial_per_ip_vol
+            warmup_factor = global_warmup_factor
+            for start_day, end_day, factor in factor_overrides:
+                if start_day <= day <= end_day:
+                    warmup_factor = factor
+                    break
+            if day in overrides:
+                emails = overrides[day]
             else:
-                warmup_factor = global_warmup_factor
-                for start_day, end_day, factor in factor_overrides:
-                    if start_day <= day <= end_day:
-                        warmup_factor = factor
-                        break
-                if day in overrides:
-                    emails = overrides[day]
-                else:
-                    emails = schedule[day - 1] * warmup_factor
-            #round values down to avoid fractional sends
-            emails = floor(emails)
-            if emails >= target_daily_send_vol:
-                emails = target_daily_send_vol
-                schedule[day] = emails
-                end_day = day
-                break
-            else:
-                schedule[day] = emails
+                emails = schedule[day - 1]["send_volume"] * warmup_factor
+        #round values down to avoid fractional sends
+        emails = floor(emails)
+        if emails >= target_daily_send_vol:
+            emails = target_daily_send_vol
+            schedule[day] = {"day": day, "send_volume": emails, "warmup_factor": warmup_factor}
+            end_day = day
+            break
+        else:
+            schedule[day] = {"day": day, "send_volume": emails, "warmup_factor": warmup_factor}
     if end_day == -1:
         end_day = day
-    assert schedule[end_day] == target_daily_send_vol
+    assert schedule[end_day]["send_volume"] == target_daily_send_vol
     with open(f'schedule{id}.txt', 'w') as outfile:
         json.dump(schedule, outfile)
     return jsonify(schedule)
 
-# GET
+@app.route('/get_schedule/', methods=['GET'])
 def get_schedule():
     id = request.form.get('id')
     assert id, "You must choose an id value"
