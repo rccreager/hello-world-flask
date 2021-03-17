@@ -33,7 +33,7 @@ def get_current_day():
     """Return the current day"""
     return current_day
 
-@app.route('/buildsched/', methods=['POST'])
+@app.route('/buildsched/', methods=['GET'])
 def build_schedule():
     """Compute the schedule, taking into account overrides"""
     print("schedule ID: 555")
