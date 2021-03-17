@@ -9,7 +9,6 @@ import os
 app = Flask(__name__)
 
 config_filename = "config.txt"
-schedule_filename = "schedule.txt"
 
 def build_schedule(config):
     target_daily_send_vol = config['target_daily_send_vol']
@@ -42,13 +41,7 @@ def build_schedule(config):
     if end_day == -1:
         end_day = day
     assert schedule[end_day] == target_daily_send_vol
-    filename = f'schedule{id}.txt'
-    with open(filename, 'w') as outfile:
-        json.dump(schedule, outfile)
     return jsonify(schedule)
-
-
-
 
 
 
@@ -67,10 +60,10 @@ def create_schedule():
         "factor_overrides" : {},
         "volume_overrides": {}
     }
-    with open(filename, 'w') as outfile:
+    with open(config_filename, 'w') as outfile:
         json.dump(config, outfile)
     schedule = build_schedule(config)
-
+    return schedule 
 
 
 
