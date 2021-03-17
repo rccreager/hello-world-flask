@@ -29,7 +29,7 @@ def build_schedule(config):
             if day in volume_overrides:
                 emails = volume_overrides[day]
             else:
-                emails = schedule[day - 1] * daily_ramp_rate
+                emails = schedule[day - 1]["sendVolume"] * daily_ramp_rate
         #round values down to avoid fractional sends
         emails = floor(emails)
         if emails >= target_daily_send_vol:
