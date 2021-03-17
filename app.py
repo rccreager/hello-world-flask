@@ -15,7 +15,7 @@ def build_schedule(config):
     first_day_vol = config["first_day_vol"]
     ramp_rate = config["ramp_rate"]
     max_schedule_length = config["max_schedule_length"]
-    factor_overrides = config["factor_overrides"]
+    ramp_rate_overrides = config["ramp_rate_overrides"]
     volume_overrides = config["volume_overrides"]
     current_day = 0
     schedule = {}
@@ -24,8 +24,8 @@ def build_schedule(config):
         if day == 0:
             emails = first_day_vol
         else:
-            if day in factor_overrides:
-                daily_ramp_rate = factor_overrides[day]
+            if day in ramp_rate_overrides:
+                daily_ramp_rate = ramp_rate_overrides[day]
             if day in volume_overrides:
                 emails = volume_overrides[day]
             else:
@@ -34,14 +34,14 @@ def build_schedule(config):
         emails = floor(emails)
         if emails >= target_daily_send_vol:
             emails = target_daily_send_vol
-            schedule[day] = emails
+            schedule[day] = {'sendVolume': emails, 'rampRate' : daily_ramp_rate}
             end_day = day
             break
         else:
-            schedule[day] = emails
+            schedule[day] = {'sendVolume': emails, 'rampRate' : daily_ramp_rate}
     if end_day == -1:
         end_day = day
-    assert schedule[end_day] == target_daily_send_vol
+    assert schedule[end_day]['sendVolume'] == target_daily_send_vol
     print(f'schedule: {schedule}')
     return jsonify(schedule)
 
@@ -59,21 +59,41 @@ def create_schedule():
         "first_day_vol" : int(first_day_vol),
         "ramp_rate" : float(ramp_rate),
         "max_schedule_length" : int(max_schedule_length),
-        "factor_overrides" : {},
+        "ramp_rate_overrides" : {},
         "volume_overrides": {}
     }
     with open(config_filename, 'w') as outfile:
         json.dump(config, outfile)
     schedule = build_schedule(config)
-    print(f'json-fieid schedule: {schedule}')
     return schedule 
 
-
-
-
-
-
-
+@app.route('/modify_schedule/', methods=['POST']) 
+def modify_schedule():
+    try:
+        with open(config_filename, 'r') as infile:
+            config = json.load(infile)
+    except:
+        return f"Schedule does not yet exist -- must create before modify\n", 404 
+    json_data = request.json
+    print(f"json_data: {json_data}")
+    data = json.loads(converted_json_data)
+    print(f"data: {data}")
+    vol_str = "sendVolume"
+    ramp_str = "rampRate"
+    for override in data:
+        day = override["day"]
+        volume = int(override[vol_str]) if vol_str in override else None
+        ramp_rate = float(override[ramp_str]) if ramp_str in override else None
+        assert ramp_rate or volume
+        if volume:
+            config["volume_overrides"][day] = volume
+        if ramp_rate:
+            config["ramp_rate_overrides"][day] = ramp_rate
+    print(f"new config: {config}")
+    with open(config_filename, 'w') as outfile:
+        json.dump(config, outfile)
+    schedule = build_schedule(config)
+    return schedule
 
 #@app.route('/create_schedule_config/', methods=['POST'])
 #def create_schedule_config():
