@@ -44,7 +44,7 @@ def create_schedule_config():
         json.dump(config, outfile)
     return config
 
-def get_config():
+def get_config_and_filename():
     id = request.form.get('id')
     assert id, "You must choose an id value"
     filename = f'config{id}.txt'
@@ -53,7 +53,7 @@ def get_config():
             config = json.load(f)
     except:
         return f"Config file {filename} doesn't exist, you must create it\n", 404
-    return config
+    return config, filename
 
 def get_factor_override_value():
     start_day = request.form.get('start_day')
@@ -66,7 +66,7 @@ def get_factor_override_value():
 
 @app.route('/add_factor_override/', methods=['PUT'])
 def add_factor_override():
-    config = get_config()
+    config = get_config_and_filename()
     factor_overrides = config["factor_overrides"]
     override = get_factor_override_value()
     if override not in factor_overrides:
@@ -80,7 +80,7 @@ def add_factor_override():
 
 @app.route('/remove_factor_override/', methods=['PUT'])
 def remove_factor_override():
-    config = get_config()
+    config = get_config_and_filename()
     factor_overrides = config["factor_overrides"]
     override = get_factor_override_value()
     if override in factor_overrides:
@@ -95,7 +95,7 @@ def remove_factor_override():
 # PUT
 @app.route('/clear_factor_overrides/', methods=['PUT'])
 def clear_factor_overrides():
-    config = get_config()
+    config, filename = get_config_and_filename()
     config["factor_overrides"] = []
     with open(filename, 'w') as outfile:
         json.dump(config, outfile)
@@ -111,7 +111,7 @@ def get_volume_override_value():
 
 @app.route('/add_volume_override/', methods=['PUT'])
 def add_volume_override():
-    config = get_config()
+    config, filename = get_config_and_filename()
     volume_overrides = config["volume_overrides"]
     day, volume = get_volume_override_value()
     volume_overrides[day] = volume
@@ -122,7 +122,7 @@ def add_volume_override():
 
 @app.route('/remove_volume_override/', methods=['PUT'])
 def remove_volume_override():
-    config = get_config()
+    config, filename = get_config_and_filename()
     volume_overrides = config["volume_overrides"]
     day = request.form.get('day') 
     assert day, "You must choose a day to remove from your volume overrides (int)"
@@ -138,7 +138,7 @@ def remove_volume_override():
 # PUT
 @app.route('/clear_volume_overrides/', methods=['PUT'])
 def clear_volume_overrides():
-    config = get_config()
+    config, filename = get_config_and_filename()
     config["volume_overrides"] = {}
     with open(filename, 'w') as outfile:
         json.dump(config, outfile)
@@ -152,12 +152,13 @@ def clear_volume_overrides():
 ## GET
 @app.route('/get_schedule_config/', methods=['GET'])
 def get_schedule_config():
-    return get_config()
+    config, filename = get_config_and_filename()
+    return config
 
 # GET
 @app.route('/build_schedule/', methods=['GET'])
 def build_schedule():
-    config = get_config()
+    config, _ = get_config_and_filename()
     target_daily_send_vol = config['target_daily_send_vol']
     number_of_ips = config['number_of_ips']
     global_warmup_factor = config['global_warmup_factor']
@@ -189,7 +190,8 @@ def build_schedule():
     if end_day == -1:
         end_day = day
     assert schedule[end_day]["send_volume"] == target_daily_send_vol
-    with open(f'schedule{id}.txt', 'w') as outfile:
+    filename = f'schedule{id}.txt'
+    with open(filename, 'w') as outfile:
         json.dump(schedule, outfile)
     return jsonify(schedule)
 
