@@ -31,6 +31,8 @@ def get_current_day():
 def build_schedule():
     """Compute the schedule, taking into account overrides"""
     print("build_schedule")
+    date_range = range(1, max_warmup_schedule_length + 1)
+    print(date_range)
     for day in range(1, max_warmup_schedule_length + 1):
         if day < current_day:
             assert day in schedule
