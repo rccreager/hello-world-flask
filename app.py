@@ -9,16 +9,15 @@ import os
 app = Flask(__name__)
 
 
-target_daily_send_vol=650000
-number_of_ips=2
-initial_per_ip_vol=50
-global_warmup_factor=1.5
-max_sched_length=50
-current_day = 1
-overrides = {}
-factor_overrides = []
-schedule = {}
-end_day = -1
+#target_daily_send_vol=650000
+#number_of_ips=2
+#initial_per_ip_vol=50
+#global_warmup_factor=1.5
+#max_sched_length=50
+#current_day = 1
+#factor_overrides = []
+#schedule = {}
+#end_day = -1
 
 @app.route('/create_schedule_config/', methods=['POST'])
 def create_schedule_config():
@@ -164,6 +163,7 @@ def build_schedule():
     global_warmup_factor = config['global_warmup_factor']
     max_sched_length = config["max_sched_length"]
     factor_overrides = config["factor_overrides"]
+    volume_overrides = config["volume_overrides"]
     current_day = 1
     for day in range(1, max_sched_length + 1):
         warmup_factor = global_warmup_factor
@@ -174,8 +174,8 @@ def build_schedule():
                 if int(start_day) <= day <= int(end_day):
                     warmup_factor = float(factor)
                     break
-            if day in overrides:
-                emails = overrides[day]
+            if day in volume_overrides:
+                emails = volume_overrides[day]
             else:
                 emails = schedule[day - 1]["send_volume"] * warmup_factor
         #round values down to avoid fractional sends
