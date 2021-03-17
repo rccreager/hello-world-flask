@@ -43,8 +43,7 @@ def create_schedule_config():
         json.dump(config, outfile)
     return config
 
-@app.route('/add_factor_override/', methods=['PUT'])
-def add_factor_override():
+def get_config():
     id = request.form.get('id')
     assert id, "You must choose an id value"
     filename = f'config{id}.txt'
@@ -53,6 +52,11 @@ def add_factor_override():
             config = json.load(f)
     except:
         return f"Config file {filename} doesn't exist, you must create it", 404
+    return config
+
+@app.route('/add_factor_override/', methods=['PUT'])
+def add_factor_override():
+    config = get_config()
     print(f"old config: {config}")
     factor_overrides = config["factor_overrides"]
     start_day = request.form.get('start_day')
@@ -74,14 +78,7 @@ def add_factor_override():
 
 @app.route('/remove_factor_override/', methods=['PUT'])
 def remove_factor_override():
-    id = request.form.get('id')
-    assert id, "You must choose an id value"
-    filename = f'config{id}.txt'
-    try:
-        with open(filename) as f:
-            config = json.load(f)
-    except:
-        return f"Config file {filename} doesn't exist, you must create it", 404
+    config = get_config() 
     print(f"old config: {config}")
     factor_overrides = config["factor_overrides"]
     start_day = request.form.get('start_day')
@@ -104,15 +101,7 @@ def remove_factor_override():
 # PUT
 @app.route('/clear_factor_overrides/', methods=['PUT'])
 def clear_factor_overrides():
-    id = request.form.get('id')
-    assert id, "You must choose an id value"
-    filename = f'config{id}.txt'
-    try:
-        with open(filename) as f:
-            config = json.load(f)
-    except:
-        return f"Config file {filename} doesn't exist, you must create it", 404
-    print(f"old config: {config}")
+    config = get_config() 
     config["factor_overrides"] = []
     print(f"new config: {config}")
     with open(filename, 'w') as outfile:
@@ -122,27 +111,12 @@ def clear_factor_overrides():
 ## GET
 @app.route('/get_schedule_config/', methods=['GET'])
 def get_schedule_config():
-    id = request.form.get('id')
-    assert id, "You must choose an id value"
-    filename = f'config{id}.txt'
-    try:
-        with open(filename) as f:
-            config = json.load(f)
-    except:
-        return f"Config file {filename} doesn't exist, you must create it", 404
-    return config
+    return get_config() 
 
 # GET
 @app.route('/build_schedule/', methods=['GET'])
 def build_schedule():
-    id = request.form.get('id')
-    assert id, "You must choose an id value"
-    filename = f'config{id}.txt'
-    try:
-        with open(filename) as f:
-            config = json.load(f)
-    except:
-        return f"Config file {filename} doesn't exist, you must create it", 404
+    config = get_config() 
     target_daily_send_vol = config['target_daily_send_vol']
     number_of_ips = config['number_of_ips']
     global_warmup_factor = config['global_warmup_factor']
