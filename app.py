@@ -61,8 +61,8 @@ def add_factor_override():
     assert start_day, "You must choose a start day (int)"
     assert end_day, "You must choose an end day (int)"
     assert factor, "You must choose the new warmup factor"
-    override = (start_day, end_day, factor)
-    if (start_day, end_day, factor) not in factor_overrides:
+    override = [start_day, end_day, factor]
+    if override not in factor_overrides:
         factor_overrides.append(override)
     else:
         return Exception(f"Override {override} already exists"), 409
@@ -90,7 +90,7 @@ def remove_factor_override():
     assert start_day, "You must choose a start day (int)"
     assert end_day, "You must choose an end day (int)"
     assert factor, "You must choose the new warmup factor"
-    override = (start_day, end_day, factor)
+    override = [start_day, end_day, factor]
     if override in factor_overrides:
         factor_overrides.remove(override)
     else:
