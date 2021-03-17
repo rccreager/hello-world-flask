@@ -73,7 +73,8 @@ def update_schedule():
             config = json.load(f)
     except:
         return f"No schedule configuration has yet been created.\n", 404
-    form_data = request.form.get("data")
+    form_data_string = request.form.get("data")
+    form_data = json.loads(form_data_string)
     for value in form_data:
         print(value)
     return "Testing form data input"
