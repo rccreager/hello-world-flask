@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 
 from copy import deepcopy
 
+from math import floor
+
 app = Flask(__name__)
 
 
@@ -49,6 +51,8 @@ def build_schedule():
                     emails = overrides[day]
                 else:
                     emails = schedule[day - 1] * warmup_factor
+            #round values down to avoid fractional sends
+            emails = floor(emails)
             if emails >= target_daily_send_vol:
                 emails = target_daily_send_vol
                 schedule[day] = emails
