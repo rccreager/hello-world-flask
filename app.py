@@ -11,7 +11,7 @@ target_daily_send_vol=650000
 number_of_ips=2
 initial_per_ip_vol=50
 number_engaged_users=500000
-warmup_factor=1.5
+global_warmup_factor=1.5
 max_warmup_schedule_length=50
 current_day = 1
 overrides = {}
@@ -40,7 +40,7 @@ def build_schedule():
             if day == 1:
                 emails = initial_per_ip_vol * initial_per_ip_vol
             else:
-                warmup_factor = warmup_factor
+                warmup_factor = global_warmup_factor
                 for start_day, end_day, factor in factor_overrides:
                     if start_day <= day <= end_day:
                         warmup_factor = factor
@@ -70,7 +70,7 @@ def add_override(day, emails):
     overrides[day] = emails
 
 def add_factor_override(start_day, end_day, factor):
-    """Use `factor` instead of the `warmup_factor` between `start_day` and `end_day` (inclusive)"""
+    """Use `factor` instead of the `global_warmup_factor` between `start_day` and `end_day` (inclusive)"""
     factor_overries.append((start_day, end_day, factor))
 
 
