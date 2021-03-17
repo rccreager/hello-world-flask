@@ -133,7 +133,7 @@ def get_schedule_config():
     return config
 
 # GET
-@app.route('/build_schedule/', methods=['GET']) 
+@app.route('/build_schedule/', methods=['GET'])
 def build_schedule():
     id = request.form.get('id')
     assert id, "You must choose an id value"
@@ -147,8 +147,8 @@ def build_schedule():
     number_of_ips = config['number_of_ips']
     global_warmup_factor = config['global_warmup_factor']
     max_sched_length = config["max_sched_length"]
-    factor_overrides = config["factor_overrides"] 
-    current_day = 1 
+    factor_overrides = config["factor_overrides"]
+    current_day = 1
     for day in range(1, max_sched_length + 1):
         if day < current_day:
             assert day in schedule
@@ -181,12 +181,17 @@ def build_schedule():
         json.dump(schedule, outfile)
     return jsonify(schedule)
 
-
-
-## GET
-#def get_schedule():
-#
-
+# GET
+def get_schedule():
+    id = request.form.get('id')
+    assert id, "You must choose an id value"
+    filename = f'schedule{id}.txt'
+    try:
+        with open(filename) as f:
+            schedule = json.load(f)
+    except:
+        return f"Schedule file {filename} doesn't exist, you must build it", 404
+    return schedule
 
 
 
