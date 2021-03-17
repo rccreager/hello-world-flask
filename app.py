@@ -15,9 +15,8 @@ app = Flask(__name__)
 target_daily_send_vol=650000
 number_of_ips=2
 initial_per_ip_vol=50
-number_engaged_users=500000
 global_warmup_factor=1.5
-max_warmup_schedule_length=50
+max_sched_length=50
 current_day = 1
 overrides = {}
 factor_overrides = []
@@ -27,9 +26,22 @@ end_day = -1
 @app.route('/createsched/', methods=['POST'])
 def create_schedule_config():
     """ create a new schedule config and write it as json txt file """
-    target_daily_send_vol = request.form.get('target_daily_send_vol', 650000)  
-    print(type(target_daily_send_vol))
-    return target_daily_send_vol
+    id = request.form.get('id')
+    assert id, "You must set the id value"
+    target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")  
+    number_of_ips = request.form.get('number_of_ips', "2")
+    global_warmup_factor = request.form.get('warmup_factor', "1.5")
+    max_sched_length = request.form.get("max_sched_length", "50")
+    config = {
+        "target_daily_send_vol" : int(target_daily_send_vol),
+        "number_of_ips" : int(number_of_ips),
+        "global_warmup_factor" : int(global_warmup_factor),
+        "max_sched_length" : int(max_sched_length),
+        "override_list" : []
+    }
+    with open(f'config{id}.txt', 'w') as outfile:
+        json.dump(config, outfile)
+    return config 
 
 
 
@@ -62,7 +74,7 @@ def get_current_day():
 def build_schedule():
     """Compute the schedule, taking into account overrides"""
     print("schedule ID: 555")
-    for day in range(1, max_warmup_schedule_length + 1):
+    for day in range(1, max_sched_length + 1):
         if day < current_day:
             assert day in schedule
         else:
