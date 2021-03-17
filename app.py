@@ -42,11 +42,13 @@ def build_schedule(config):
     if end_day == -1:
         end_day = day
     assert schedule[end_day] == target_daily_send_vol
+    print(f'schedule: {schedule}')
     return jsonify(schedule)
 
 @app.route('/create_schedule/', methods=['POST'])
 def create_schedule():
     json_data = request.json
+    print(f'json_data: {json_data}')
     target_daily_send_vol = json_data['targetDailySendVolume']
     first_day_vol = json_data['firstDayVolume']
     ramp_rate = json_data['startingRampRate']
@@ -63,18 +65,8 @@ def create_schedule():
     with open(config_filename, 'w') as outfile:
         json.dump(config, outfile)
     schedule = build_schedule(config)
+    print(f'json-fieid schedule: {schedule}')
     return schedule 
-
-@app.route('/update_schedule/', methods=['POST'])  
-def update_schedule():
-    try:
-        with open(config_filename) as f:
-            config = json.load(f)
-    except:
-        return f"No schedule configuration has yet been created.\n", 404
-    form_data_json = request.json
-    print(form_data_json)
-    return "Testing form data input"
 
 
 
