@@ -18,6 +18,7 @@ def build_schedule(config):
     factor_overrides = config["factor_overrides"]
     volume_overrides = config["volume_overrides"]
     current_day = 0
+    schedule = {}
     for day in range(0, max_schedule_length + 1):
         daily_ramp_rate = ramp_rate
         if day == 0:
