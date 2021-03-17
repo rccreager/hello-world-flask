@@ -1,15 +1,6 @@
 # app.py
 from flask import Flask, request, jsonify
 
-from flask_restful import Resource, Api
-
-import pickle
-import os.path
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from googleapiclient import errors
-
 from copy import deepcopy
 
 app = Flask(__name__)
