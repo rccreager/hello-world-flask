@@ -61,7 +61,7 @@ def create_schedule():
     assert target_daily_send_vol and first_day_vol and ramp_rate and max_schedule_length
     config = {
         "target_daily_send_vol" : int(target_daily_send_vol),
-        "first_day_vol" : int(first_day_vol)
+        "first_day_vol" : int(first_day_vol),
         "ramp_rate" : float(ramp_rate),
         "max_sched_length" : int(max_sched_length),
         "factor_overrides" : {},
