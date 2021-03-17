@@ -5,6 +5,8 @@ from copy import deepcopy
 
 from math import floor
 
+import json
+
 app = Flask(__name__)
 
 
@@ -21,6 +23,8 @@ factor_overrides = []
 schedule = {}
 end_day = -1
 
+
+
 def set_current_day(day: int):
     """Sets the current day to `day`. The schedule will be fixed (and not recomputed) for previous days"""
     current_day = day
@@ -29,12 +33,10 @@ def get_current_day():
     """Return the current day"""
     return current_day
 
-@app.route('/buildsched/', methods=['GET'])
+@app.route('/buildsched/', methods=['POST'])
 def build_schedule():
     """Compute the schedule, taking into account overrides"""
-    print("build_schedule")
-    date_range = range(1, max_warmup_schedule_length + 1)
-    print(date_range)
+    print("schedule ID: 555")
     for day in range(1, max_warmup_schedule_length + 1):
         if day < current_day:
             assert day in schedule
@@ -63,7 +65,20 @@ def build_schedule():
     if end_day == -1:
         end_day = day
     assert schedule[end_day] == target_daily_send_vol
+    with open('schedule555.txt', 'w') as outfile:
+        json.dump(schedule, outfile)
     return jsonify(schedule)
+
+@app.route('/getsched/', methods=['GET']) 
+def read_schedule(id = 555):
+    try:
+        with open(f'schedule{id}.txt') as json_file:
+            data = json.load(json_file)
+        print(data)
+        return data
+    except:
+        print("file not found!")
+        return "file not found"
 
 def get_schedule():
     """Return a copy of the current schedule"""
@@ -75,7 +90,7 @@ def add_override(day, emails):
 
 def add_factor_override(start_day, end_day, factor):
     """Use `factor` instead of the `global_warmup_factor` between `start_day` and `end_day` (inclusive)"""
-    factor_overries.append((start_day, end_day, factor))
+    factor_overrides.append((start_day, end_day, factor))
 
 
 
