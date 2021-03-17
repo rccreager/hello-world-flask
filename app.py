@@ -104,7 +104,7 @@ def clear_factor_overrides():
 
 def get_volume_override_value():
     day = request.form.get('day')
-    volumne = request.form.get('volume')
+    volume = request.form.get('volume')
     assert day, "You must choose a day whose send volume you want to override (int)"
     assert volume, f"You must choose a send value to override for day {day}"
     return day, volume
