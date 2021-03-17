@@ -20,12 +20,12 @@ factor_overrides = []
 schedule = {}
 end_day = -1
 
-@app.route('/create_sched/', methods=['POST'])
+@app.route('/create_schedule_config/', methods=['POST'])
 def create_schedule_config():
     """ create a new schedule config and write it as json txt file """
     id = request.form.get('id')
     assert id, "You must set the id value"
-    file_name = f'config{id}.txt'
+    filename = f'config{id}.txt'
     if os.path.exists(file_name) and os.path.isfile(file_name):
         return f"Schedule {filename} already exists", 409
     target_daily_send_vol = request.form.get('target_daily_send_vol', "650000")
@@ -101,14 +101,37 @@ def remove_factor_override():
         json.dump(config, outfile)
     return config
 
-## PUT
-#def clear_factor_overrides():
-#
-#
+# PUT
+@app.route('/clear_factor_overrides/', methods=['PUT'])
+def clear_factor_overrides():
+    id = request.form.get('id')
+    assert id, "You must choose an id value"
+    filename = f'config{id}.txt'
+    try:
+        with open(filename) as f:
+            config = json.load(f)
+    except:
+        return f"Config file {filename} doesn't exist, you must create it", 404
+    print(f"old config: {config}")
+    config["factor_overrides"] = []
+    print(f"new config: {config}")
+    with open(filename, 'w') as outfile:
+        json.dump(config, outfile)
+    return config
+
 ## GET
-#def get_schedule_config():
-#
-#
+@app.route('/get_schedule_config/', methods=['GET'])
+def get_schedule_config():
+    id = request.form.get('id')
+    assert id, "You must choose an id value"
+    filename = f'config{id}.txt'
+    try:
+        with open(filename) as f:
+            config = json.load(f)
+    except:
+        return f"Config file {filename} doesn't exist, you must create it", 404
+    return config
+
 ## GET
 #def build_schedule():
 #
@@ -179,10 +202,6 @@ def read_schedule(id = 555):
     except:
         print("file not found!")
         return "file not found"
-
-def get_schedule():
-    """Return a copy of the current schedule"""
-    return deepcopy(schedule)
 
 def add_override(day, emails):
     """Set a specific number of emails to send on a particular `day`"""
