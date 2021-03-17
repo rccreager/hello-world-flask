@@ -66,10 +66,17 @@ def create_schedule():
     schedule = build_schedule(config)
     return schedule 
 
-
-
-
-
+@app.route('/update_schedule/', methods=['POST'])  
+def update_schedule():
+    try:
+        with open(config_filename) as f:
+            config = json.load(f)
+    except:
+        return f"No schedule configuration has yet been created.\n", 404
+    form_data = request.form
+    for value in form_data:
+        print(value)
+    return "Testing phase"
 
 
 
