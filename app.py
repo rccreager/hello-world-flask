@@ -35,7 +35,7 @@ def create_schedule_config():
     config = {
         "target_daily_send_vol" : int(target_daily_send_vol),
         "number_of_ips" : int(number_of_ips),
-        "global_warmup_factor" : int(global_warmup_factor),
+        "global_warmup_factor" : float(global_warmup_factor),
         "max_sched_length" : int(max_sched_length),
         "override_list" : []
     }
