@@ -66,7 +66,7 @@ def get_factor_override_value():
 
 @app.route('/add_factor_override/', methods=['PUT'])
 def add_factor_override():
-    config = get_config_and_filename()
+    config, filename = get_config_and_filename()
     factor_overrides = config["factor_overrides"]
     override = get_factor_override_value()
     if override not in factor_overrides:
@@ -80,7 +80,7 @@ def add_factor_override():
 
 @app.route('/remove_factor_override/', methods=['PUT'])
 def remove_factor_override():
-    config = get_config_and_filename()
+    config, filename = get_config_and_filename()
     factor_overrides = config["factor_overrides"]
     override = get_factor_override_value()
     if override in factor_overrides:
