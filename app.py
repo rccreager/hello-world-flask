@@ -7,12 +7,12 @@ app = Flask(__name__)
 
 
 
-target_daily_send_vol=650000,
-number_of_ips=2,
-initial_per_ip_vol=50,
-number_engaged_users=500000,
-warmup_factor=1.5,
-max_warmup_schedule_length=50,
+target_daily_send_vol=650000
+number_of_ips=2
+initial_per_ip_vol=50
+number_engaged_users=500000
+warmup_factor=1.5
+max_warmup_schedule_length=50
 current_day = 1
 overrides = {}
 factor_overrides = []
