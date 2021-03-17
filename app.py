@@ -164,6 +164,7 @@ def build_schedule():
     max_sched_length = config["max_sched_length"]
     factor_overrides = config["factor_overrides"]
     volume_overrides = config["volume_overrides"]
+    initial_per_ip_vol=50 
     current_day = 1
     for day in range(1, max_sched_length + 1):
         warmup_factor = global_warmup_factor
@@ -175,7 +176,7 @@ def build_schedule():
                     warmup_factor = float(factor)
                     break
             if day in volume_overrides:
-                emails = volume_overrides[day]
+                emails = int(volume_overrides[day])
             else:
                 emails = schedule[day - 1]["send_volume"] * warmup_factor
         #round values down to avoid fractional sends
