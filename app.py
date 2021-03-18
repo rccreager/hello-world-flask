@@ -88,17 +88,15 @@ def modify_schedule():
     except Exception as e:
         print(e)
         return f"Schedule does not yet exist -- must create before modify\n", 404 
-    json_data = request.json
-    print(f"json_data: {json_data}")
-    print(f"type: {type(json_data)}")
-    data = json.loads(json_data)
+    data = request.json
     print(f"data: {data}")
     vol_str = "sendVolume"
     ramp_str = "rampRate"
-    for override in data:
-        day = override["day"]
+    for _, override in data:
+        day = int(override["day"])
         volume = int(override[vol_str]) if vol_str in override else None
         ramp_rate = float(override[ramp_str]) if ramp_str in override else None
+        print(f"day: {day}, volume: {volume}, ramp_rate: {ramp_rate}")
         assert ramp_rate or volume
         if volume:
             config["volume_overrides"][day] = volume
