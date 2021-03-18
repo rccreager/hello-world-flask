@@ -73,9 +73,10 @@ def create_schedule():
 @app.route('/get_schedule/', methods=['GET'])
 def get_schedule():
     try:
-        with open(schedule_name, 'r') as infile:
+        with open(schedule_filename, 'r') as infile:
             schedule = json.load(infile)
-    except:
+    except Exception as e:
+        print(e)
         return f"Schedule does not yet exist -- must create before getting\n", 404 
     return schedule
 
