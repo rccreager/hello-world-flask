@@ -84,7 +84,8 @@ def modify_schedule():
     try:
         with open(config_filename, 'r') as infile:
             config = json.load(infile)
-    except:
+    except Exception as e:
+        print(e)
         return f"Schedule does not yet exist -- must create before modify\n", 404 
     json_data = request.json
     print(f"json_data: {json_data}")
