@@ -88,8 +88,20 @@ def modify_schedule():
     except Exception as e:
         print(e)
         return f"Schedule does not yet exist -- must create before modify\n", 404 
+    # when writing out config as json, all keys are automatically converted to strings
+    # so let's first convert them back to ints
+    ramp_rate_overrides = {}
+    volume_overrides = {}
+    for key, value in config['ramp_rate_overrides'].items():
+        ramp_rate_overrides[int(key)] = float(value)
+    for key, value in config['volume_overrides'].items():
+        volume_overrides[int(key)] = int(value)
+    config['ramp_rate_overrides'] = ramp_rate_overrides
+    config['volume_overrides'] = volume_overrides
+    # next, let's add the new overrides to our config
     data = request.json
-    print(f"data: {data}")
+    print(f"initial config: {config}")
+    print(f"json data: {data}")
     vol_str = "sendVolume"
     ramp_str = "rampRate"
     for _, override in data.items():
