@@ -92,7 +92,7 @@ def modify_schedule():
     print(f"data: {data}")
     vol_str = "sendVolume"
     ramp_str = "rampRate"
-    for _, override in data:
+    for _, override in data.items():
         day = int(override["day"])
         volume = int(override[vol_str]) if vol_str in override else None
         ramp_rate = float(override[ramp_str]) if ramp_str in override else None
