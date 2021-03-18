@@ -90,6 +90,7 @@ def modify_schedule():
         return f"Schedule does not yet exist -- must create before modify\n", 404 
     json_data = request.json
     print(f"json_data: {json_data}")
+    print(f"type: {type(json_data)}")
     data = json.loads(json_data)
     print(f"data: {data}")
     vol_str = "sendVolume"
