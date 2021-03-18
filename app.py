@@ -9,6 +9,7 @@ import os
 app = Flask(__name__)
 
 config_filename = "config.txt"
+schedule_filename = "schedule.txt"
 
 def build_schedule(config):
     target_daily_send_vol = config['target_daily_send_vol']
@@ -43,6 +44,8 @@ def build_schedule(config):
         end_day = day
     assert schedule[end_day]['sendVolume'] == target_daily_send_vol
     print(f'schedule: {schedule}')
+    with open(schedule_filename, 'w') as outfile:
+        json.dump(schedule, outfile)
     return jsonify(schedule)
 
 @app.route('/create_schedule/', methods=['POST'])
@@ -67,7 +70,16 @@ def create_schedule():
     schedule = build_schedule(config)
     return schedule 
 
-@app.route('/modify_schedule/', methods=['POST']) 
+@app.route('/get_schedule/', methods=['GET'])
+def get_schedule():
+    try:
+        with open(schedule_name, 'r') as infile:
+            schedule = json.load(infile)
+    except:
+        return f"Schedule does not yet exist -- must create before getting\n", 404 
+    return schedule
+
+@app.route('/modify_schedule/', methods=['POST'])
 def modify_schedule():
     try:
         with open(config_filename, 'r') as infile:
